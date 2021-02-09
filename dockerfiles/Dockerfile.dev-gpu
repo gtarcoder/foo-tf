@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest-jupyter
+FROM tensorflow/tensorflow:latest-gpu-jupyter
 MAINTAINER debugman007 (skc361@163.com)
 
 RUN apt-get update && apt-get install -y openssh-server openssh-client vim wget curl sudo
@@ -23,4 +23,4 @@ EXPOSE 22
 CMD ["bash", "-c", "source /etc/bash.bashrc && /usr/sbin/sshd && jupyter notebook --notebook-dir=/tf --ip 0.0.0.0 --no-browser --allow-root"]
 
 # 启动命令:
-# docker run -it -v /data/foo-tf/:/home/foo-tf/workspace/ -p 34567:8888 -p 34568:22 debugman007/tf-dev:latest
+# docker run -it -v /data/foo-tf/:/home/foo-tf/workspace/ -p 34567:8888 -p 34568:22 debugman007/tf-dev-gpu:latest
