@@ -18,3 +18,5 @@
 
 ### 二、tutorial  
 1. tutorial/classification.ipynb 为一个对图片进行多分类的任务.  
+2. tutorial/classification-advance.ipynb 自定义model class 来完成图片多分类任务.  
+
