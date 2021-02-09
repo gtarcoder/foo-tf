@@ -1,0 +1,28 @@
+FROM tensorflow/tensorflow:latest-jupyter
+MAINTAINER debugman007 (skc361@163.com)
+
+RUN apt-get update && apt-get install -y openssh-server openssh-client vim wget curl sudo
+
+#配置ssh
+RUN mkdir /var/run/sshd
+
+RUN sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+ENV NOTVISIBLE "in users profile"
+RUN echo "export VISIBLE=now" >> /etc/profile
+
+RUN useradd -m foo-tf
+RUN echo "foo-tf:foo-tf" | chpasswd
+RUN cd /etc/sudoers.d && touch nopasswdsudo && echo "test ALL=(ALL) ALL" >> nopasswdsudo
+#把 foo-tf 用户的shell改成bash，否则ssh登录ubuntu服务器，命令行不显示用户名和目录
+RUN usermod -s /bin/bash foo-tf
+
+USER foo-tf
+RUN mkdir ~/.ssh/ && ssh-keygen -t rsa -P '' -f ~/.ssh/id_rsa && cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+
+USER root
+EXPOSE 22
+CMD ["bash", "-c", "source /etc/bash.bashrc && /usr/sbin/sshd && jupyter notebook --notebook-dir=/tf --ip 0.0.0.0 --no-browser --allow-root"]
+
+# 启动命令:
+# docker run -it -v /data/foo-tf/:/home/foo-tf/workspace/ -p 34567:8888 -p 34568:22 debugman007/tf-dev:latest
